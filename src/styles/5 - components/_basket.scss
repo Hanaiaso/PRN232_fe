@@ -39,8 +39,23 @@
   animation: slide-up .5s ease;
 }
 
+.basket-item-selector {
+  width: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  input[type="checkbox"] {
+    display: block !important;
+    width: 20px !important;
+    height: 20px !important;
+    accent-color: $black; // Optional: matches theme if supported
+  }
+}
+
 .basket-item-wrapper {
-  width: 100%;
+  // width: 100%;
+  flex: 1;
   display: flex;
   align-items: center;
   padding: 0 $s-size;
@@ -112,7 +127,7 @@
   width: 142px;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis; 
+  text-overflow: ellipsis;
   position: relative;
 }
 

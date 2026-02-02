@@ -1,20 +1,29 @@
 import { ArrowRightOutlined, ShopOutlined } from '@ant-design/icons';
 import { BasketItem } from '@/components/basket';
 import { CHECKOUT_STEP_2 } from '@/constants/routes';
-import { displayMoney } from '@/helpers/utils';
+import { displayMoney, calculateTotal } from '@/helpers/utils';
 import { useDocumentTitle, useScrollTop } from '@/hooks';
 import PropType from 'prop-types';
 import React from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { StepTracker } from '../components';
 import withCheckout from '../hoc/withCheckout';
 
+// eslint-disable-next-line react/prop-types
 const OrderSummary = ({ basket, subtotal }) => {
   useDocumentTitle('Check Out Step 1 | Salinaka');
   useScrollTop();
   const dispatch = useDispatch();
   const history = useHistory();
+  // Get selected items from Redux
+  const { selectedItems } = useSelector((state) => ({ selectedItems: state.checkout.selectedItems }));
+
+  // Filter basket based on selection. If no selection (direct link), maybe show all? 
+  // For now, strict filtering.
+  const filteredBasket = basket.filter(p => selectedItems.includes(p.cartItemId));
+  const filteredSubtotal = calculateTotal(filteredBasket.map(p => p.price * p.quantity));
+
   const onClickPrevious = () => history.push('/');
   const onClickNext = () => history.push(CHECKOUT_STEP_2);
 
@@ -26,7 +35,7 @@ const OrderSummary = ({ basket, subtotal }) => {
         <span className="d-block text-center">Review items in your basket.</span>
         <br />
         <div className="checkout-items">
-          {basket.map((product) => (
+          {filteredBasket.map((product) => (
             <BasketItem
               basket={basket}
               dispatch={dispatch}
@@ -38,7 +47,7 @@ const OrderSummary = ({ basket, subtotal }) => {
         <br />
         <div className="basket-total text-right">
           <p className="basket-total-title">Subtotal:</p>
-          <h2 className="basket-total-amount">{displayMoney(subtotal)}</h2>
+          <h2 className="basket-total-amount">{displayMoney(filteredSubtotal)}</h2>
         </div>
         <br />
         <div className="checkout-shipping-action">
