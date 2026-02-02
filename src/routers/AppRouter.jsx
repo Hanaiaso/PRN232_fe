@@ -71,17 +71,25 @@ const AppRouter = () => (
           exact
           path={ROUTES.ACCOUNT_EDIT}
         />
-        <ClientRoute
+        <Route
           component={view.CheckOutStep1}
           path={ROUTES.CHECKOUT_STEP_1}
         />
-        <ClientRoute
+        <Route
           component={view.CheckOutStep2}
           path={ROUTES.CHECKOUT_STEP_2}
         />
-        <ClientRoute
+        <Route
           component={view.CheckOutStep3}
           path={ROUTES.CHECKOUT_STEP_3}
+        />
+        <Route
+          component={view.CheckoutSuccess}
+          path={ROUTES.CHECKOUT_SUCCESS}
+        />
+        <Route
+          component={view.CheckoutCancel}
+          path={ROUTES.CHECKOUT_CANCEL}
         />
         <AdminRoute
           component={view.Dashboard}

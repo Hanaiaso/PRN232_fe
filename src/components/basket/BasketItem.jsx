@@ -4,16 +4,25 @@ import { ImageLoader } from '@/components/common';
 import { displayMoney } from '@/helpers/utils';
 import PropType from 'prop-types';
 import React from 'react';
-import { useDispatch } from 'react-redux';
+import { useBasket } from '@/hooks';
 import { Link } from 'react-router-dom';
-import { removeFromBasket } from '@/redux/actions/basketActions';
 
-const BasketItem = ({ product }) => {
-  const dispatch = useDispatch();
-  const onRemoveFromBasket = () => dispatch(removeFromBasket(product.id));
+const BasketItem = ({ product, isSelected, onToggleSelection }) => {
+  const { removeFromBasket } = useBasket();
+  const onRemoveFromBasket = () => removeFromBasket(product.cartItemId);
 
   return (
     <div className="basket-item">
+      {onToggleSelection && (
+        <div className="basket-item-selector" style={{ marginRight: '15px', display: 'flex', alignItems: 'center' }}>
+          <input
+            type="checkbox"
+            checked={isSelected || false}
+            onChange={onToggleSelection}
+            style={{ width: '20px', height: '20px', cursor: 'pointer' }}
+          />
+        </div>
+      )}
       <BasketItemControl product={product} />
       <div className="basket-item-wrapper">
         <div className="basket-item-img-wrapper">
@@ -34,24 +43,28 @@ const BasketItem = ({ product }) => {
               <span className="spec-title">Quantity</span>
               <h5 className="my-0">{product.quantity}</h5>
             </div>
-            <div>
-              <span className="spec-title">Size</span>
-              <h5 className="my-0">
-                {product.selectedSize}
-                {' '}
-                mm
-              </h5>
-            </div>
-            <div>
-              <span className="spec-title">Color</span>
-              <div style={{
-                backgroundColor: product.selectedColor || product.availableColors[0],
-                width: '15px',
-                height: '15px',
-                borderRadius: '50%'
-              }}
-              />
-            </div>
+            {product.selectedSize && (
+              <div>
+                <span className="spec-title">Size</span>
+                <h5 className="my-0">
+                  {product.selectedSize}
+                  {' '}
+                  mm
+                </h5>
+              </div>
+            )}
+            {product.selectedColor && (
+              <div>
+                <span className="spec-title">Color</span>
+                <div style={{
+                  backgroundColor: product.selectedColor || product.availableColors?.[0] || '#000',
+                  width: '15px',
+                  height: '15px',
+                  borderRadius: '50%'
+                }}
+                />
+              </div>
+            )}
           </div>
         </div>
         <div className="basket-item-price">
@@ -71,7 +84,7 @@ const BasketItem = ({ product }) => {
 
 BasketItem.propTypes = {
   product: PropType.shape({
-    id: PropType.string,
+    id: PropType.oneOfType([PropType.string, PropType.number]),
     name: PropType.string,
     brand: PropType.string,
     price: PropType.number,
@@ -88,7 +101,9 @@ BasketItem.propTypes = {
     isFeatured: PropType.bool,
     isRecommended: PropType.bool,
     availableColors: PropType.arrayOf(PropType.string)
-  }).isRequired
+  }).isRequired,
+  isSelected: PropType.bool,
+  onToggleSelection: PropType.func
 };
 
 export default BasketItem;

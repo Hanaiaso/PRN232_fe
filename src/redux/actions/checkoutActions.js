@@ -1,6 +1,11 @@
 import {
-  RESET_CHECKOUT, SET_CHECKOUT_PAYMENT_DETAILS, SET_CHECKOUT_SHIPPING_DETAILS
+  RESET_CHECKOUT, SET_CHECKOUT_PAYMENT_DETAILS, SET_CHECKOUT_SHIPPING_DETAILS, SET_CHECKOUT_SELECTED_ITEMS
 } from '@/constants/constants';
+
+export const setSelectedItems = (items) => ({
+  type: SET_CHECKOUT_SELECTED_ITEMS,
+  payload: items
+});
 
 export const setShippingDetails = (details) => ({
   type: SET_CHECKOUT_SHIPPING_DETAILS,

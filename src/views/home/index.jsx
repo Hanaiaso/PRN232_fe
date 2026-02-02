@@ -1,6 +1,7 @@
 import { ArrowRightOutlined } from '@ant-design/icons';
 import { MessageDisplay } from '@/components/common';
 import { ProductShowcaseGrid } from '@/components/product';
+import { BackendTestProduct } from '@/components/dev';
 import { FEATURED_PRODUCTS, RECOMMENDED_PRODUCTS, SHOP } from '@/constants/routes';
 import {
   useDocumentTitle, useFeaturedProducts, useRecommendedProducts, useScrollTop
@@ -84,6 +85,14 @@ const Home = () => {
               skeletonCount={6}
             />
           )}
+        </div>
+
+        {/* Test Section for Backend Integration */}
+        <div className="display">
+          <div className="display-header">
+            <h1>Backend Integration Test</h1>
+          </div>
+          <BackendTestProduct />
         </div>
       </div>
     </main>

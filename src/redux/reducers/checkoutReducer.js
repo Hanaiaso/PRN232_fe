@@ -1,5 +1,5 @@
 import {
-  RESET_CHECKOUT, SET_CHECKOUT_PAYMENT_DETAILS, SET_CHECKOUT_SHIPPING_DETAILS
+  RESET_CHECKOUT, SET_CHECKOUT_PAYMENT_DETAILS, SET_CHECKOUT_SHIPPING_DETAILS, SET_CHECKOUT_SELECTED_ITEMS
 } from '@/constants/constants';
 
 const defaultState = {
@@ -10,11 +10,17 @@ const defaultState = {
     cardnumber: '',
     expiry: '',
     ccv: ''
-  }
+  },
+  selectedItems: []
 };
 
 export default (state = defaultState, action) => {
   switch (action.type) {
+    case SET_CHECKOUT_SELECTED_ITEMS:
+      return {
+        ...state,
+        selectedItems: action.payload
+      };
     case SET_CHECKOUT_SHIPPING_DETAILS:
       return {
         ...state,

@@ -1,6 +1,7 @@
 .checkout {
   width: 100%;
   animation: slide-up .5s ease;
+  margin-top: 4rem; // Fix header overlap
 
   @include mobile {
     margin-top: 2rem;
@@ -166,7 +167,7 @@
 .checkout-field {
   width: 100%;
   margin: 0 $s-size;
-  
+
   @include mobile {
     margin: 0
   }
@@ -176,7 +177,7 @@
   display: flex;
   align-items: center;
 
-  & > div {
+  &>div {
     margin-bottom: $s-size;
   }
 

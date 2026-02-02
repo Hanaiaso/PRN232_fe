@@ -2,13 +2,13 @@
 import { BasketItem, BasketToggle } from '@/components/basket';
 import { Boundary, Modal } from '@/components/common';
 import { CHECKOUT_STEP_1 } from '@/constants/routes';
-import firebase from 'firebase/firebase';
 import { calculateTotal, displayMoney } from '@/helpers/utils';
-import { useDidMount, useModal } from '@/hooks';
+import { useDidMount, useModal, useBasket } from '@/hooks';
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useLocation } from 'react-router-dom';
 import { clearBasket } from '@/redux/actions/basketActions';
+import { setSelectedItems as setSelectedItemsAction } from '@/redux/actions/checkoutActions';
 
 const Basket = () => {
   const { isOpenModal, onOpenModal, onCloseModal } = useModal();
@@ -22,23 +22,62 @@ const Basket = () => {
   const didMount = useDidMount();
 
   useEffect(() => {
-    if (didMount && firebase.auth.currentUser && basket.length !== 0) {
-      firebase.saveBasketItems(basket, firebase.auth.currentUser.uid)
-        .then(() => {
-          console.log('Item saved to basket');
-        })
-        .catch((e) => {
-          console.log(e);
-        });
+    // Redundant Firebase sync removed found in original lines 24-34
+  }, [basket.length]);
+
+  // const onCheckOut = () => {
+  //   // Verified user check removed for Hardcoded Backend ID support
+  //   if (basket.length !== 0) {
+  //     document.body.classList.remove('is-basket-open');
+  //     history.push(CHECKOUT_STEP_1);
+  //   } else {
+  //     // Logic for empty basket
+  //   }
+  // };
+
+  // const onSignInClick = () => {
+  //   onCloseModal();
+  //   document.body.classList.remove('basket-open');
+  //   history.push(CHECKOUT_STEP_1);
+  // };
+
+  const { clearBasket } = useBasket(); // hook import kept if needed elsewhere, but unused here now
+  const [selectedItems, setSelectedItems] = React.useState([]);
+
+  // Default select all items when basket loads
+  useEffect(() => {
+    if (basket.length > 0) {
+      // Keep existing selections, add new ones, remove stale ones? 
+      // Simple approach: Select all if selection is empty, otherwise keep sync?
+      // Better: Initialize with all IDs.
+      const allIds = basket.map(p => p.cartItemId);
+      setSelectedItems(allIds);
     }
   }, [basket.length]);
 
-  const onCheckOut = () => {
-    if ((basket.length !== 0 && user)) {
-      document.body.classList.remove('is-basket-open');
-      history.push(CHECKOUT_STEP_1);
+  const onToggleSelection = (cartItemId) => {
+    if (selectedItems.includes(cartItemId)) {
+      setSelectedItems(selectedItems.filter(id => id !== cartItemId));
     } else {
-      onOpenModal();
+      setSelectedItems([...selectedItems, cartItemId]);
+    }
+  };
+
+  const onCheckOut = () => {
+    // BYPASS AUTH: Always allow checkout for dev
+    // if ((basket.length !== 0 && store.auth.id)) { 
+    if (basket.length !== 0) { // Removed auth check
+      document.body.classList.remove('is-basket-open');
+      // Dispatch selected items to Redux for persistence
+      dispatch(setSelectedItemsAction(selectedItems));
+      // Still pass state as backup or for immediate use if needed (redundant but safe)
+      history.push({
+        pathname: CHECKOUT_STEP_1,
+        state: { selectedCartItemIds: selectedItems }
+      });
+    } else {
+      // Logic for empty selection or basket
+      // Maybe show toast: "Please select at least one item"
     }
   };
 
@@ -48,10 +87,9 @@ const Basket = () => {
     history.push(CHECKOUT_STEP_1);
   };
 
-  const onClearBasket = () => {
-    if (basket.length !== 0) {
-      dispatch(clearBasket());
-    }
+  const calculateSelectedTotal = () => {
+    const selectedProducts = basket.filter(p => selectedItems.includes(p.cartItemId));
+    return calculateTotal(selectedProducts.map((product) => product.price * product.quantity));
   };
 
   return user && user.role === 'ADMIN' ? null : (
@@ -102,14 +140,7 @@ const Basket = () => {
                 </span>
               )}
             </BasketToggle>
-            <button
-              className="basket-clear button button-border button-border-gray button-small"
-              disabled={basket.length === 0}
-              onClick={onClearBasket}
-              type="button"
-            >
-              <span>Clear Basket</span>
-            </button>
+            {/* Clear Basket Button Removed */}
           </div>
           {basket.length <= 0 && (
             <div className="basket-empty">
@@ -119,10 +150,12 @@ const Basket = () => {
           {basket.map((product, i) => (
             <BasketItem
               // eslint-disable-next-line react/no-array-index-key
-              key={`${product.id}_${i}`}
+              key={`${product.cartItemId || product.id}_${i}`}
               product={product}
               basket={basket}
               dispatch={dispatch}
+              isSelected={selectedItems.includes(product.cartItemId)}
+              onToggleSelection={() => onToggleSelection(product.cartItemId)}
             />
           ))}
         </div>
@@ -130,12 +163,12 @@ const Basket = () => {
           <div className="basket-total">
             <p className="basket-total-title">Subtotal Amout:</p>
             <h2 className="basket-total-amount">
-              {displayMoney(calculateTotal(basket.map((product) => product.price * product.quantity)))}
+              {displayMoney(calculateSelectedTotal())}
             </h2>
           </div>
           <button
             className="basket-checkout-button button"
-            disabled={basket.length === 0 || pathname === '/checkout'}
+            disabled={basket.length === 0 || selectedItems.length === 0 || pathname === '/checkout'}
             onClick={onCheckOut}
             type="button"
           >
