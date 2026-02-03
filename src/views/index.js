@@ -18,6 +18,7 @@ export { default as Home } from './home';
 export { default as RecommendedProducts } from './recommended';
 export { default as Search } from './search';
 export { default as Shop } from './shop';
+export { default as TestPage } from './testpage';
 export { default as ViewProduct } from './view_product';
 export { default as ViewAuction } from './view_auction';
 

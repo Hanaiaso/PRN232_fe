@@ -58,6 +58,11 @@ const AppRouter = () => (
           path={ROUTES.FORGOT_PASSWORD}
         />
         <Route
+          component={view.TestPage}
+          exact
+          path={ROUTES.TESTPAGE}
+        />
+        <Route
           component={view.ViewProduct}
           path={ROUTES.VIEW_PRODUCT}
         />
