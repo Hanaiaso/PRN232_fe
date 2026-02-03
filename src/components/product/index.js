@@ -1,4 +1,5 @@
 export { default as AppliedFilters } from './ProductAppliedFilters';
+export { default as AuctionItem } from './AuctionItem';
 export { default as FeaturedProduct } from './ProductFeatured';
 export { default as ProductGrid } from './ProductGrid';
 export { default as ProductItem } from './ProductItem';

@@ -20,3 +20,4 @@ export const CHECKOUT_STEP_3 = '/checkout/step3';
 export const CHECKOUT_SUCCESS = '/checkout/success';
 export const CHECKOUT_CANCEL = '/checkout/cancel';
 export const VIEW_PRODUCT = '/product/:id';
+export const VIEW_AUCTION = '/auction/:id';

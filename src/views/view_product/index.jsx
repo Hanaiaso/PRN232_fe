@@ -1,5 +1,5 @@
 import { ArrowLeftOutlined, LoadingOutlined } from '@ant-design/icons';
-import { ColorChooser, ImageLoader, MessageDisplay } from '@/components/common';
+import { ColorChooser, ImageLoader, MessageDisplay, ChatWidget } from '@/components/common';
 import { ProductShowcaseGrid } from '@/components/product';
 import { RECOMMENDED_PRODUCTS, SHOP } from '@/constants/routes';
 import { displayMoney } from '@/helpers/utils';
@@ -24,6 +24,7 @@ const ViewProduct = () => {
   const [selectedImage, setSelectedImage] = useState(product?.image || '');
   const [selectedSize, setSelectedSize] = useState('');
   const [selectedColor, setSelectedColor] = useState('');
+  const [showChat, setShowChat] = useState(false);
 
   const {
     recommendedProducts,
@@ -139,8 +140,21 @@ const ViewProduct = () => {
                 >
                   {isItemOnBasket(product.id) ? 'Remove From Basket' : 'Add To Basket'}
                 </button>
+                <button
+                  className="button button-small button-muted margin-left-s"
+                  onClick={() => setShowChat(true)}
+                  type="button"
+                >
+                  Contact Seller
+                </button>
               </div>
             </div>
+            {showChat && (
+              <ChatWidget
+                shopName={product.brand || 'Shop'}
+                onClose={() => setShowChat(false)}
+              />
+            )}
           </div>
           <div style={{ marginTop: '10rem' }}>
             <div className="display-header">
