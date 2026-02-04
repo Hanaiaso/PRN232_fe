@@ -1,39 +1,91 @@
-// API Client - centralized fetch utility
+// API Client - centralized fetch utility with token attach + auto-refresh
 import { API_CONFIG } from './config';
+import {
+  getAccessToken,
+  getRefreshToken,
+  setAccessToken,
+  setRefreshToken,
+  removeTokens
+} from './token';
 
 const defaultHeaders = {
   'Content-Type': 'application/json'
 };
 
-/**
- * Generic API call function
- * @param {string} endpoint - API endpoint path
- * @param {object} options - fetch options (method, headers, body, etc.)
- * @returns {Promise} - API response
- */
+async function doFetch(url, config) {
+  const response = await fetch(url, config);
+  return response;
+}
+
 export const apiCall = async (endpoint, options = {}) => {
   const url = `${API_CONFIG.BASE_URL}${endpoint}`;
-  const config = {
-    ...options,
-    headers: {
-      ...defaultHeaders,
-      ...options.headers
-    }
+  const headers = {
+    ...defaultHeaders,
+    ...options.headers
   };
 
-  try {
-    const response = await fetch(url, config);
-    
-    if (!response.ok) {
-      throw new Error(`API Error: ${response.status} ${response.statusText}`);
-    }
+  // Attach Authorization if access token exists
+  const accessToken = getAccessToken();
+  if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
 
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error('API Call Error:', error);
+  const config = {
+    ...options,
+    headers
+  };
+
+  let response = await doFetch(url, config);
+
+  // Handle 401 -> try refresh
+  if (response.status === 401) {
+    // try refresh token
+    const refreshToken = getRefreshToken();
+    if (refreshToken) {
+      try {
+        const rtResponse = await fetch(`${API_CONFIG.BASE_URL}/api/auth/refresh`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refreshToken })
+        });
+
+        if (rtResponse.ok) {
+          const rtData = await rtResponse.json();
+          setAccessToken(rtData.accessToken);
+          setRefreshToken(rtData.refreshToken);
+
+          // retry original request with new token
+          config.headers.Authorization = `Bearer ${rtData.accessToken}`;
+          response = await doFetch(url, config);
+        } else {
+          // refresh failed - clear tokens
+          removeTokens();
+          throw new Error('Refresh token invalid');
+        }
+      } catch (e) {
+        removeTokens();
+        throw e;
+      }
+    }
+  }
+
+  if (!response.ok) {
+    // try parse json error
+    let errorText = `${response.status} ${response.statusText}`;
+    try {
+      const json = await response.json();
+      errorText = json?.message || JSON.stringify(json) || errorText;
+    } catch (e) {
+      // ignore
+    }
+    const error = new Error(`API Error: ${errorText}`);
+    error.status = response.status;
     throw error;
   }
+
+  // no content
+  if (response.status === 204) return null;
+
+  const data = await response.json();
+  return data;
 };
 
 /**
