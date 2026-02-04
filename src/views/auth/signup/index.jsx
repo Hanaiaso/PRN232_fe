@@ -45,7 +45,8 @@ const SignUp = ({ history }) => {
     dispatch(signUp({
       fullname: form.fullname.trim(),
       email: form.email.trim().toLowerCase(),
-      password: form.password.trim()
+      password: form.password.trim(),
+      confirmPassword: form.password.trim()
     }));
   };
 

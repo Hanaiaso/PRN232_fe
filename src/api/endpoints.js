@@ -1,6 +1,7 @@
-// export const API_BASE_URL = 'http://localhost:5000/api'; // Or your backend URL
-// export const API_BASE_URL = 'http://localhost:5000/api'; // Or your backend URL
-export const API_BASE_URL = 'http://localhost:5282/api'; // Correct port from launchSettings
+import { API_CONFIG } from './config';
+
+// API base uses Vite env variable VITE_API_URL (see .env)
+export const API_BASE_URL = `${API_CONFIG.BASE_URL}/api`;
 
 // BYPASS AUTH: Hardcoded User ID for Testing
 export const TEST_USER_ID = 40;

@@ -57,6 +57,10 @@ const AppRouter = () => (
           component={view.ForgotPassword}
           path={ROUTES.FORGOT_PASSWORD}
         />
+        <PublicRoute
+          component={view.ConfirmEmail}
+          path={ROUTES.CONFIRM_EMAIL}
+        />
         <Route
           component={view.ViewProduct}
           path={ROUTES.VIEW_PRODUCT}
