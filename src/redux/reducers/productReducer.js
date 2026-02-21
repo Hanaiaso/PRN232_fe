@@ -23,7 +23,7 @@ export default (state = {
         ...state,
         lastRefKey: action.payload.lastKey,
         total: action.payload.total,
-        items: [...state.items, ...action.payload.products]
+        items: action.payload.products // Thay vì nối mảng, chúng ta gán lại mảng mới để tránh trùng lặp khi quay lại trang
       };
     case ADD_PRODUCT_SUCCESS:
       return {

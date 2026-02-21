@@ -1,6 +1,6 @@
 import { ImageLoader } from '@/components/common';
 import { EDIT_PRODUCT } from '@/constants/routes';
-import { displayActionMessage, displayDate, displayMoney } from '@/helpers/utils';
+import { displayActionMessage, displayMoney } from '@/helpers/utils';
 import PropType from 'prop-types';
 import React, { useRef } from 'react';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
@@ -32,10 +32,7 @@ const ProductItem = ({ product }) => {
   };
 
   return (
-    <SkeletonTheme
-      color="#e1e1e1"
-      highlightColor="#f2f2f2"
-    >
+    <SkeletonTheme color="#e1e1e1" highlightColor="#f2f2f2">
       <div
         className={`item item-products ${!product.id && 'item-loading'}`}
         ref={productRef}
@@ -54,18 +51,16 @@ const ProductItem = ({ product }) => {
             <span className="text-overflow-ellipsis">{product.name || <Skeleton width={50} />}</span>
           </div>
           <div className="grid-col">
-            <span>{product.brand || <Skeleton width={50} />}</span>
+            <span>{product.categoryName || <Skeleton width={50} />}</span>
           </div>
           <div className="grid-col">
             <span>{product.price ? displayMoney(product.price) : <Skeleton width={30} />}</span>
           </div>
           <div className="grid-col">
-            <span>
-              {product.dateAdded ? displayDate(product.dateAdded) : <Skeleton width={30} />}
-            </span>
+            <span>{product.totalStock !== undefined ? product.totalStock : <Skeleton width={20} />}</span>
           </div>
           <div className="grid-col">
-            <span>{product.maxQuantity || <Skeleton width={20} />}</span>
+            <span>{product.sellerName || <Skeleton width={50} />}</span>
           </div>
         </div>
         {product.id && (
@@ -86,13 +81,13 @@ const ProductItem = ({ product }) => {
               Delete
             </button>
             <div className="item-action-confirm">
-              <h5>Are you sure you want to delete this?</h5>
+              <h5>Bạn có chắc chắn muốn xóa sản phẩm này?</h5>
               <button
                 className="button button-small button-border"
                 onClick={onCancelDelete}
                 type="button"
               >
-                No
+                Không
               </button>
               &nbsp;
               <button
@@ -100,7 +95,7 @@ const ProductItem = ({ product }) => {
                 onClick={onConfirmDelete}
                 type="button"
               >
-                Yes
+                Xóa
               </button>
             </div>
           </div>
@@ -112,21 +107,13 @@ const ProductItem = ({ product }) => {
 
 ProductItem.propTypes = {
   product: PropType.shape({
-    id: PropType.string,
+    id: PropType.oneOfType([PropType.string, PropType.number]),
     name: PropType.string,
-    brand: PropType.string,
-    price: PropType.number,
-    maxQuantity: PropType.number,
-    description: PropType.string,
-    keywords: PropType.arrayOf(PropType.string),
-    imageCollection: PropType.arrayOf(PropType.object),
-    sizes: PropType.arrayOf(PropType.string),
     image: PropType.string,
-    imageUrl: PropType.string,
-    isFeatured: PropType.bool,
-    isRecommended: PropType.bool,
-    dateAdded: PropType.number,
-    availableColors: PropType.arrayOf(PropType.string)
+    categoryName: PropType.string,
+    price: PropType.number,
+    totalStock: PropType.number,
+    sellerName: PropType.string
   }).isRequired
 };
 
