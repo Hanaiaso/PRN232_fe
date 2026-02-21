@@ -4,8 +4,9 @@ import {
   Field, Form, Formik
 } from 'formik';
 import PropType from 'prop-types';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import * as Yup from 'yup';
+import { getCategories } from '@/api/endpoints/category';
 
 const FormSchema = Yup.object().shape({
   title: Yup.string()
@@ -27,6 +28,12 @@ const FormSchema = Yup.object().shape({
 });
 
 const ProductForm = ({ product, onSubmit, isLoading }) => {
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    getCategories().then(setCategories).catch(console.error);
+  }, []);
+
   const initFormikValues = {
     title: product?.title || product?.name || '',
     description: product?.description || '',
@@ -98,17 +105,20 @@ const ProductForm = ({ product, onSubmit, isLoading }) => {
               {/* Category ID */}
               <div className="product-form-field">
                 <label className="label" htmlFor="categoryId">
-                  * Category ID
+                  * Category
                 </label>
                 <Field
-                  disabled={isLoading}
+                  as="select"
+                  disabled={isLoading || categories.length === 0}
                   id="categoryId"
                   name="categoryId"
-                  type="number"
-                  min="1"
-                  placeholder="VD: 1"
                   className={`input-form d-block ${errors.categoryId && touched.categoryId ? 'input-error' : ''}`}
-                />
+                >
+                  <option value="" disabled hidden>-- Chọn Danh Mục --</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                  ))}
+                </Field>
                 {errors.categoryId && touched.categoryId && (
                   <span className="input-message">{errors.categoryId}</span>
                 )}

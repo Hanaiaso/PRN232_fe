@@ -10,7 +10,7 @@ const Shop = () => {
   useScrollTop();
 
   const store = useSelector((state) => ({
-    filteredProducts: selectFilter(state.products.items, state.filter),
+    filteredProducts: state.products.items, // Backend already filtered this
     products: state.products,
     requestStatus: state.app.requestStatus,
     isLoading: state.app.loading
