@@ -50,14 +50,24 @@ function* productSaga({ type, payload }) {
       try {
         yield initRequest();
         const state = yield select();
-
-        const products = yield call(getFeaturedProducts, 50);
-
-        const result = {
-          products,
-          lastKey: null,
-          total: products.length
+        
+        // Map frontend Redux filter state to backend ProductSearchDto
+        const searchParams = {
+          pageSize: 50,
         };
+
+        if (state.filter.keyword) searchParams.search = state.filter.keyword;
+        if (state.filter.brand) searchParams.categoryId = state.filter.brand; // Map frontend 'brand' to backend 'categoryId' for now
+        if (state.filter.minPrice > 0) searchParams.minPrice = state.filter.minPrice;
+        if (state.filter.maxPrice > 0) searchParams.maxPrice = state.filter.maxPrice;
+        
+        // Map sort options
+        if (state.filter.sortBy === 'name-asc') searchParams.sortBy = 'title';
+        else if (state.filter.sortBy === 'name-desc') searchParams.sortBy = 'title_desc';
+        else if (state.filter.sortBy === 'price-asc') searchParams.sortBy = 'price_asc';
+        else if (state.filter.sortBy === 'price-desc') searchParams.sortBy = 'price_desc';
+
+        const result = yield call(getProducts, searchParams);
 
         if (result.products.length === 0) {
           yield handleError({ message: 'No items found.' });
