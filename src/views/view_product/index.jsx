@@ -1,6 +1,6 @@
 import { ArrowLeftOutlined, LoadingOutlined, StarFilled } from '@ant-design/icons';
 import { ImageLoader, MessageDisplay, ChatWidget } from '@/components/common';
-import { ProductShowcaseGrid } from '@/components/product';
+import { ProductShowcaseGrid, ProductReviews } from '@/components/product';
 import { RECOMMENDED_PRODUCTS, SHOP } from '@/constants/routes';
 import { displayMoney } from '@/helpers/utils';
 import {
@@ -256,6 +256,9 @@ const ViewProduct = () => {
               />
             )}
           </div>
+
+          {/* Product Reviews */}
+          <ProductReviews productId={product.id} />
 
           {/* Recommended products */}
           <div style={{ marginTop: '10rem' }}>
