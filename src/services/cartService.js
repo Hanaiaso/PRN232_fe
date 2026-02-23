@@ -1,12 +1,12 @@
-import { ENDPOINTS, TEST_USER_ID } from '@/api/endpoints';
+import { get, post, put, del } from '../api/client';
+
+const BASE = '/api/cart';
 
 export const cartService = {
     getCart: async () => {
         try {
-            const response = await fetch(ENDPOINTS.CART.GET_CART(TEST_USER_ID));
-            if (!response.ok) throw new Error('Failed to fetch cart');
-            const data = await response.json();
-            return data.items || [];
+            const response = await get(`${BASE}`);
+            return response.items || [];
         } catch (error) {
             console.error(error);
             return [];
@@ -15,22 +15,11 @@ export const cartService = {
 
     addToCart: async (product) => {
         try {
-            const response = await fetch(ENDPOINTS.CART.ADD, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    userId: TEST_USER_ID,
-                    productId: product.id,
-                    productVariantId: product.variantId || 0, // Fallback if no variant logic yet
-                    quantity: 1
-                })
+            await post(`${BASE}/add`, {
+                productId: product.id,
+                productVariantId: product.variantId || 0,
+                quantity: 1
             });
-            if (!response.ok) {
-                const err = await response.json();
-                throw new Error(err.message || 'Failed to add to cart');
-            }
             return true;
         } catch (error) {
             console.error(error);
@@ -40,17 +29,10 @@ export const cartService = {
 
     updateQuantity: async (cartItemId, quantity) => {
         try {
-            const response = await fetch(ENDPOINTS.CART.UPDATE, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    cartItemId,
-                    quantity
-                })
+            await put(`${BASE}/update-quantity`, {
+                cartItemId,
+                quantity
             });
-            if (!response.ok) throw new Error('Failed to update quantity');
             return true;
         } catch (error) {
             console.error(error);
@@ -60,10 +42,7 @@ export const cartService = {
 
     removeItem: async (cartItemId) => {
         try {
-            const response = await fetch(ENDPOINTS.CART.REMOVE(cartItemId), {
-                method: 'DELETE'
-            });
-            if (!response.ok) throw new Error('Failed to remove item');
+            await del(`${BASE}/items/${cartItemId}`);
             return true;
         } catch (error) {
             console.error(error);
@@ -73,10 +52,7 @@ export const cartService = {
 
     clearCart: async () => {
         try {
-            const response = await fetch(ENDPOINTS.CART.CLEAR(TEST_USER_ID), {
-                method: 'DELETE'
-            });
-            if (!response.ok) throw new Error('Failed to clear cart');
+            await del(`${BASE}/clear`);
             return true;
         } catch (error) {
             console.error(error);
@@ -86,13 +62,8 @@ export const cartService = {
 
     getCheckoutSummary: async (cartItemIds) => {
         try {
-            const response = await fetch(ENDPOINTS.CART.SUMMARY, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ cartItemIds })
-            });
-            if (!response.ok) throw new Error('Failed to get summary');
-            return await response.json();
+            const response = await post(`${BASE}/summary`, { cartItemIds });
+            return response;
         } catch (error) {
             throw error;
         }
@@ -100,13 +71,8 @@ export const cartService = {
 
     placeOrder: async (cartItemIds) => {
         try {
-            const response = await fetch(ENDPOINTS.CART.PLACE_ORDER, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ cartItemIds, userId: TEST_USER_ID, addressId: 26 })
-            });
-            if (!response.ok) throw new Error('Failed to place order');
-            return await response.json();
+            const response = await post(`${BASE}/place-order`, { cartItemIds, addressId: 26 });
+            return response;
         } catch (error) {
             throw error;
         }
@@ -114,11 +80,9 @@ export const cartService = {
 
     createPayPalOrder: async (orderId) => {
         try {
-            const response = await fetch(ENDPOINTS.CART.PAYPAL_CREATE(orderId), {
-                method: 'POST'
-            });
-            if (!response.ok) throw new Error('Failed to create PayPal order');
-            return await response.json();
+            // Note: post without body is valid in our client.js
+            const response = await post(`${BASE}/paypal/create-from-order/${orderId}`);
+            return response;
         } catch (error) {
             throw error;
         }
@@ -126,13 +90,11 @@ export const cartService = {
 
     capturePayPalPayment: async ({ payPalOrderId, orderId }) => {
         try {
-            const response = await fetch(ENDPOINTS.CART.PAYPAL_CAPTURE, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ PayPalOrderId: payPalOrderId, OrderId: parseInt(orderId, 10) })
+            const response = await post(`${BASE}/paypal/capture-payment`, {
+                PayPalOrderId: payPalOrderId,
+                OrderId: parseInt(orderId, 10)
             });
-            if (!response.ok) throw new Error('Failed to capture payment');
-            return await response.json();
+            return response;
         } catch (error) {
             throw error;
         }
