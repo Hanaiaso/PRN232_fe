@@ -5,7 +5,7 @@ import { FORGOT_PASSWORD, SIGNUP } from '@/constants/routes';
 import { Field, Form, Formik } from 'formik';
 import { useDocumentTitle, useScrollTop } from '@/hooks';
 import PropType from 'prop-types';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { signIn } from '@/redux/actions/authActions';
@@ -27,6 +27,7 @@ const SignIn = ({ history }) => {
   }));
 
   const dispatch = useDispatch();
+  const [accountType, setAccountType] = useState('personal');
 
   useScrollTop();
   useDocumentTitle('Sign In | Salinaka');
@@ -39,7 +40,7 @@ const SignIn = ({ history }) => {
   const onSignUp = () => history.push(SIGNUP);
 
   const onSubmitForm = (form) => {
-    dispatch(signIn(form.email, form.password));
+    dispatch(signIn(form.email, form.password, accountType));
   };
 
   const onClickLink = (e) => {
@@ -66,6 +67,25 @@ const SignIn = ({ history }) => {
           <div className={`auth ${authStatus?.message && (!authStatus?.success && 'input-error')}`}>
             <div className="auth-main">
               <h3>Sign in to Salinaka</h3>
+              <br />
+              <div className="account-type-buttons">
+                <button
+                  className={`button ${accountType === 'personal' ? 'button-primary' : 'button-border button-border-gray'}`}
+                  onClick={() => setAccountType('personal')}
+                  type="button"
+                  disabled={isAuthenticating}
+                >
+                  Personal
+                </button>
+                <button
+                  className={`button ${accountType === 'business' ? 'button-primary' : 'button-border button-border-gray'}`}
+                  onClick={() => setAccountType('business')}
+                  type="button"
+                  disabled={isAuthenticating}
+                >
+                  Business
+                </button>
+              </div>
               <br />
               <div className="auth-wrapper">
                 <Formik

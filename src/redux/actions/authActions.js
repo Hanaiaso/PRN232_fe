@@ -1,10 +1,11 @@
 import * as type from '@/constants/constants';
 
-export const signIn = (email, password) => ({
+export const signIn = (email, password, accountType = 'personal') => ({
   type: type.SIGNIN,
   payload: {
     email,
-    password
+    password,
+    accountType
   }
 });
 
@@ -22,7 +23,7 @@ export const signInWithGithub = () => ({
 
 export const signUp = (user) => ({
   type: type.SIGNUP,
-  payload: user
+  payload: { ...user, accountType: user.accountType || 'personal' }
 });
 
 export const signInSuccess = (auth) => ({
