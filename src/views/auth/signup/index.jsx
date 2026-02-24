@@ -5,7 +5,7 @@ import { SIGNIN } from '@/constants/routes';
 import { Field, Form, Formik } from 'formik';
 import { useDocumentTitle, useScrollTop } from '@/hooks';
 import PropType from 'prop-types';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { signUp } from '@/redux/actions/authActions';
 import { setAuthenticating, setAuthStatus } from '@/redux/actions/miscActions';
@@ -19,8 +19,8 @@ const SignInSchema = Yup.object().shape({
     .required('Password is required.')
     .min(8, 'Password length should be at least 8 characters.')
     .matches(/[A-Z\W]/g, 'Password should contain at least 1 uppercase letter.'),
-  fullname: Yup.string()
-    .required('Full name is required.')
+  name: Yup.string()
+    .required('Name is required.')
     .min(4, 'Name should be at least 4 characters.')
 });
 
@@ -30,6 +30,7 @@ const SignUp = ({ history }) => {
     authStatus: state.app.authStatus
   }));
   const dispatch = useDispatch();
+  const [accountType, setAccountType] = useState('personal');
 
   useScrollTop();
   useDocumentTitle('Sign Up | Salinaka');
@@ -43,10 +44,11 @@ const SignUp = ({ history }) => {
 
   const onFormSubmit = (form) => {
     dispatch(signUp({
-      fullname: form.fullname.trim(),
+      name: form.name.trim(),
       email: form.email.trim().toLowerCase(),
       password: form.password.trim(),
-      confirmPassword: form.password.trim()
+      confirmPassword: form.password.trim(),
+      accountType
     }));
   };
 
@@ -70,9 +72,27 @@ const SignUp = ({ history }) => {
           <div className={`auth ${authStatus?.message && (!authStatus?.success && 'input-error')}`}>
             <div className="auth-main">
               <h3>Sign up to Salinaka</h3>
+              <div className="account-type-buttons">
+                <button
+                  className={`button ${accountType === 'personal' ? 'button-primary' : 'button-border button-border-gray'}`}
+                  onClick={() => setAccountType('personal')}
+                  type="button"
+                  disabled={isAuthenticating}
+                >
+                  Personal
+                </button>
+                <button
+                  className={`button ${accountType === 'business' ? 'button-primary' : 'button-border button-border-gray'}`}
+                  onClick={() => setAccountType('business')}
+                  type="button"
+                  disabled={isAuthenticating}
+                >
+                  Business
+                </button>
+              </div>
               <Formik
                 initialValues={{
-                  fullname: '',
+                  name: '',
                   email: '',
                   password: ''
                 }}
@@ -85,10 +105,10 @@ const SignUp = ({ history }) => {
                     <div className="auth-field">
                       <Field
                         disabled={isAuthenticating}
-                        name="fullname"
+                        name="name"
                         type="text"
-                        label="* Full Name"
-                        placeholder="John Doe"
+                        label={accountType === 'personal' ? '* Full Name' : '* Business Name'}
+                        placeholder={accountType === 'personal' ? 'John Doe' : 'Business Name'}
                         style={{ textTransform: 'capitalize' }}
                         component={CustomInput}
                       />
@@ -98,8 +118,8 @@ const SignUp = ({ history }) => {
                         disabled={isAuthenticating}
                         name="email"
                         type="email"
-                        label="* Email"
-                        placeholder="test@example.com"
+                        label={accountType === 'personal' ? '* Email' : '* Business Email'}
+                        placeholder={accountType === 'personal' ? 'test@example.com' : 'business@example.com'}
                         component={CustomInput}
                       />
                     </div>
