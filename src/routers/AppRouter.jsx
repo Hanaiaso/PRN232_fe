@@ -80,6 +80,11 @@ const AppRouter = () => (
           path={ROUTES.ACCOUNT_EDIT}
         />
         <Route
+          component={view.PurchaseHistory}
+          exact
+          path={ROUTES.PURCHASE_HISTORY}
+        />
+        <Route
           component={view.CheckOutStep1}
           path={ROUTES.CHECKOUT_STEP_1}
         />
