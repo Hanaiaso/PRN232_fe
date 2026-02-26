@@ -1,4 +1,13 @@
+import { useState } from 'react';
+
 const OrderList = ({ orders }) => {
+  const [openDropdown, setOpenDropdown] = useState(null);
+
+  const handleAction = (action, itemId) => {
+    console.log(`Action: ${action}, Item ID: ${itemId}`);
+    setOpenDropdown(null);
+  };
+
   if (!orders || orders.length === 0) {
     return <div className="purchase-history-empty">No orders found</div>;
   }
@@ -22,22 +31,44 @@ const OrderList = ({ orders }) => {
           <div className="order-items">
             {order.items && order.items.length > 0 ? (
               order.items.map((item, index) => (
-                <div key={index} className="order-item">
-                  <div className="order-item-image">
-                    {item.productImage ? (
-                      <img src={item.productImage} alt={item.productName} />
-                    ) : (
-                      <div className="order-item-placeholder">No Image</div>
-                    )}
+                <div key={index}>
+                  <div className="order-item">
+                    <div className="order-item-image">
+                      {item.productImage ? (
+                        <img src={item.productImage} alt={item.productName} />
+                      ) : (
+                        <div className="order-item-placeholder">No Image</div>
+                      )}
+                    </div>
+                    <div className="order-item-details">
+                      <h3>{item.productName}</h3>
+                      <p className="order-item-category">{item.categoryName}</p>
+                      <p className="order-item-quantity">Quantity: {item.quantity}</p>
+                    </div>
+                    <div className="order-item-price">
+                      <span className="unit-price">${item.unitPrice}</span>
+                      <span className="total-price">${item.totalPrice}</span>
+                    </div>
                   </div>
-                  <div className="order-item-details">
-                    <h3>{item.productName}</h3>
-                    <p className="order-item-category">{item.categoryName}</p>
-                    <p className="order-item-quantity">Quantity: {item.quantity}</p>
-                  </div>
-                  <div className="order-item-price">
-                    <span className="unit-price">${item.unitPrice}</span>
-                    <span className="total-price">${item.totalPrice}</span>
+                  <div className="order-item-actions">
+                    <div className="dropdown">
+                      <button 
+                        className="dropdown-toggle"
+                        onClick={() => setOpenDropdown(openDropdown === `${order.id}-${index}` ? null : `${order.id}-${index}`)}
+                      >
+                        More actions ▼
+                      </button>
+                      {openDropdown === `${order.id}-${index}` && (
+                        <div className="dropdown-menu">
+                          <button onClick={() => handleAction('Leave feedback', item.productId)}>Leave feedback</button>
+                          <button onClick={() => handleAction('View order detail', order.id)}>View order detail</button>
+                          <button onClick={() => handleAction('Contact seller', item.productId)}>Contact seller</button>
+                          <button onClick={() => handleAction('Return this item', item.productId)}>Return this item</button>
+                          <button onClick={() => handleAction('Resolve a problem', order.id)}>Resolve a problem</button>
+                          <button onClick={() => handleAction('Hide order', order.id)}>Hide order</button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))
