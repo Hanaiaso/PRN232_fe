@@ -1,15 +1,19 @@
 import { useState } from 'react';
 import ReturnRequestModal from './ReturnRequestModal';
+import OrderDetailModal from './OrderDetailModal';
 
 const OrderList = ({ orders }) => {
   const [openDropdown, setOpenDropdown] = useState(null);
   const [returnModal, setReturnModal] = useState({ isOpen: false, order: null, item: null });
+  const [detailModal, setDetailModal] = useState({ isOpen: false, order: null });
 
   const handleAction = (action, order, item) => {
     setOpenDropdown(null);
     
     if (action === 'Return this item') {
       setReturnModal({ isOpen: true, order, item });
+    } else if (action === 'View order detail') {
+      setDetailModal({ isOpen: true, order });
     } else {
       console.log(`Action: ${action}`);
     }
@@ -96,6 +100,12 @@ const OrderList = ({ orders }) => {
         onClose={() => setReturnModal({ isOpen: false, order: null, item: null })}
         order={returnModal.order}
         item={returnModal.item}
+      />
+      
+      <OrderDetailModal
+        isOpen={detailModal.isOpen}
+        onClose={() => setDetailModal({ isOpen: false, order: null })}
+        order={detailModal.order}
       />
     </div>
   );
