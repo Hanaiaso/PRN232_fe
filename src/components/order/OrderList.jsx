@@ -1,11 +1,18 @@
 import { useState } from 'react';
+import ReturnRequestModal from './ReturnRequestModal';
 
 const OrderList = ({ orders }) => {
   const [openDropdown, setOpenDropdown] = useState(null);
+  const [returnModal, setReturnModal] = useState({ isOpen: false, order: null, item: null });
 
-  const handleAction = (action, itemId) => {
-    console.log(`Action: ${action}, Item ID: ${itemId}`);
+  const handleAction = (action, order, item) => {
     setOpenDropdown(null);
+    
+    if (action === 'Return this item') {
+      setReturnModal({ isOpen: true, order, item });
+    } else {
+      console.log(`Action: ${action}`);
+    }
   };
 
   if (!orders || orders.length === 0) {
@@ -60,12 +67,12 @@ const OrderList = ({ orders }) => {
                       </button>
                       {openDropdown === `${order.id}-${index}` && (
                         <div className="dropdown-menu">
-                          <button onClick={() => handleAction('Leave feedback', item.productId)}>Leave feedback</button>
-                          <button onClick={() => handleAction('View order detail', order.id)}>View order detail</button>
-                          <button onClick={() => handleAction('Contact seller', item.productId)}>Contact seller</button>
-                          <button onClick={() => handleAction('Return this item', item.productId)}>Return this item</button>
-                          <button onClick={() => handleAction('Resolve a problem', order.id)}>Resolve a problem</button>
-                          <button onClick={() => handleAction('Hide order', order.id)}>Hide order</button>
+                          <button onClick={() => handleAction('Leave feedback', order, item)}>Leave feedback</button>
+                          <button onClick={() => handleAction('View order detail', order, item)}>View order detail</button>
+                          <button onClick={() => handleAction('Contact seller', order, item)}>Contact seller</button>
+                          <button onClick={() => handleAction('Return this item', order, item)}>Return this item</button>
+                          <button onClick={() => handleAction('Resolve a problem', order, item)}>Resolve a problem</button>
+                          <button onClick={() => handleAction('Hide order', order, item)}>Hide order</button>
                         </div>
                       )}
                     </div>
@@ -83,6 +90,13 @@ const OrderList = ({ orders }) => {
           </div>
         </div>
       ))}
+      
+      <ReturnRequestModal
+        isOpen={returnModal.isOpen}
+        onClose={() => setReturnModal({ isOpen: false, order: null, item: null })}
+        order={returnModal.order}
+        item={returnModal.item}
+      />
     </div>
   );
 };
