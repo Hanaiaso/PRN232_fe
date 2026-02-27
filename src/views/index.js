@@ -21,4 +21,6 @@ export { default as Search } from './search';
 export { default as Shop } from './shop';
 export { default as ViewProduct } from './view_product';
 export { default as ViewAuction } from './view_auction';
+export { default as PurchaseHistory } from './purchase_history';
+export { default as SellerHub } from './seller_hub';
 

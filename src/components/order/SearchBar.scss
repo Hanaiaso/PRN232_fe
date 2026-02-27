@@ -1,0 +1,58 @@
+@import '../../styles/2 - tools/mixins';
+
+.purchase-search-bar {
+  display: flex;
+  gap: 0.8rem;
+
+  @include mobile {
+    width: 100%;
+  }
+}
+
+.purchase-search-input-wrapper {
+  position: relative;
+
+  @include mobile {
+    flex: 1;
+  }
+}
+
+.purchase-search-input {
+  width: 320px;
+  padding: 1rem 3.6rem 1rem 1.4rem;
+  border: 1px solid #ccc;
+  border-radius: 2.4rem;
+  font-size: 1.4rem;
+  outline: none;
+  color: #111;
+
+  @include mobile {
+    width: 100%;
+  }
+}
+
+.purchase-search-clear {
+  position: absolute;
+  right: 1.2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #666;
+  font-size: 1.8rem;
+}
+
+.purchase-search-button {
+  background-color: #3665f3;
+  color: #fff;
+  border: none;
+  border-radius: 2.4rem;
+  padding: 1rem 2.4rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  @include mobile {
+    padding: 1rem 1.5rem;
+    font-size: 1.3rem;
+  }
+}

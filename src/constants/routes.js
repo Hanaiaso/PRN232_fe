@@ -22,3 +22,5 @@ export const CHECKOUT_SUCCESS = '/checkout/success';
 export const CHECKOUT_CANCEL = '/checkout/cancel';
 export const VIEW_PRODUCT = '/product/:id';
 export const VIEW_AUCTION = '/auction/:id';
+export const PURCHASE_HISTORY = '/purchase-history';
+export const SELLER_HUB = '/seller-hub';
