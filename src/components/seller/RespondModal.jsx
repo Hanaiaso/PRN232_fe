@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { getAccessToken } from '@/api/token';
 
 const RespondModal = ({ isOpen, onClose, request, onSuccess }) => {
@@ -8,6 +8,7 @@ const RespondModal = ({ isOpen, onClose, request, onSuccess }) => {
   const [showNewAddress, setShowNewAddress] = useState(false);
   const [newAddress, setNewAddress] = useState({
     recipientName: '',
+    phone: '',
     street: '',
     city: '',
     state: '',
@@ -15,12 +16,30 @@ const RespondModal = ({ isOpen, onClose, request, onSuccess }) => {
     country: ''
   });
   const [loading, setLoading] = useState(false);
+  const [savedAddresses, setSavedAddresses] = useState([]);
 
-  // Mock saved addresses - replace with API call
-  const savedAddresses = [
-    { id: 1, label: '123 Main St, New York, NY 10001' },
-    { id: 2, label: '456 Oak Ave, Los Angeles, CA 90001' }
-  ];
+  useEffect(() => {
+    if (isOpen) {
+      fetchAddresses();
+    }
+  }, [isOpen]);
+
+  const fetchAddresses = async () => {
+    try {
+      const token = getAccessToken();
+      const res = await fetch('https://localhost:49547/api/user/addresses', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSavedAddresses(data);
+      }
+    } catch (error) {
+      console.error('Error fetching addresses:', error);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,6 +47,40 @@ const RespondModal = ({ isOpen, onClose, request, onSuccess }) => {
 
     try {
       const token = getAccessToken();
+      let returnAddressId = null;
+
+      // Nếu accept và chọn tạo địa chỉ mới
+      if (accept && showNewAddress) {
+        const addressRes = await fetch('https://localhost:49547/api/user/addresses', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            FullName: newAddress.recipientName,
+            Phone: newAddress.phone || '',
+            Street: newAddress.street,
+            City: newAddress.city,
+            State: newAddress.state,
+            Country: newAddress.country,
+            Detail: '',
+            IsDefault: false
+          })
+        });
+
+        const addressResult = await addressRes.json();
+        if (!addressRes.ok) {
+          alert('Failed to create address');
+          setLoading(false);
+          return;
+        }
+        returnAddressId = addressResult.id;
+      } else if (accept && selectedAddress) {
+        returnAddressId = parseInt(selectedAddress);
+      }
+
+      // Respond return request
       const res = await fetch(`https://localhost:49547/api/ReturnRequest/${request.id}/respond`, {
         method: 'PUT',
         headers: {
@@ -36,7 +89,8 @@ const RespondModal = ({ isOpen, onClose, request, onSuccess }) => {
         },
         body: JSON.stringify({
           Accept: accept,
-          Response: response
+          Response: response,
+          ReturnAddressId: returnAddressId
         })
       });
 
@@ -46,6 +100,16 @@ const RespondModal = ({ isOpen, onClose, request, onSuccess }) => {
         alert(result.message || 'Response submitted successfully!');
         setAccept(true);
         setResponse('');
+        setSelectedAddress('');
+        setShowNewAddress(false);
+        setNewAddress({
+          recipientName: '',
+          street: '',
+          city: '',
+          state: '',
+          zipCode: '',
+          country: ''
+        });
         onSuccess();
         onClose();
       } else {
@@ -96,7 +160,9 @@ const RespondModal = ({ isOpen, onClose, request, onSuccess }) => {
                 >
                   <option value="">Select return address</option>
                   {savedAddresses.map(addr => (
-                    <option key={addr.id} value={addr.id}>{addr.label}</option>
+                    <option key={addr.id} value={addr.id}>
+                      {addr.fullName} - {addr.street}, {addr.city}, {addr.state}, {addr.country}
+                    </option>
                   ))}
                   <option value="new">+ Add new address</option>
                 </select>
@@ -112,6 +178,14 @@ const RespondModal = ({ isOpen, onClose, request, onSuccess }) => {
                       value={newAddress.recipientName}
                       onChange={(e) => setNewAddress({...newAddress, recipientName: e.target.value})}
                       required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Phone</label>
+                    <input
+                      type="text"
+                      value={newAddress.phone}
+                      onChange={(e) => setNewAddress({...newAddress, phone: e.target.value})}
                     />
                   </div>
                   <div className="form-group">
