@@ -1,41 +1,13 @@
 import { useState } from 'react';
-import RespondModal from './RespondModal';
-import ReturnRequestDetailModal from '../order/ReturnRequestDetailModal';
-import { getAccessToken } from '@/api/token';
+import ShipReturnModal from './ShipReturnModal';
+import ReturnRequestDetailModal from './ReturnRequestDetailModal';
 
-const ReturnRequestList = ({ requests, onRefresh }) => {
-  const [respondModal, setRespondModal] = useState({ isOpen: false, request: null });
+const BuyerReturnRequestList = ({ requests, onRefresh }) => {
+  const [shipModal, setShipModal] = useState({ isOpen: false, request: null });
   const [detailModal, setDetailModal] = useState({ isOpen: false, requestId: null });
 
-  const handleConfirmReceived = async (requestId) => {
-    if (!confirm('Confirm that you have received the returned item?')) return;
-
-    try {
-      const token = getAccessToken();
-      const res = await fetch(`https://localhost:49547/api/ReturnRequest/${requestId}/received`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      const result = await res.json();
-
-      if (res.ok && result.success) {
-        alert(result.message || 'Confirmed successfully!');
-        onRefresh();
-      } else {
-        alert(result.message || 'Failed to confirm');
-      }
-    } catch (error) {
-      console.error('Error confirming received:', error);
-      alert('Error confirming. Please try again.');
-    }
-  };
-
   if (!requests || requests.length === 0) {
-    return <div className="seller-hub-empty">No return requests found</div>;
+    return <div className="purchase-history-empty">No return requests found</div>;
   }
 
   return (
@@ -64,7 +36,7 @@ const ReturnRequestList = ({ requests, onRefresh }) => {
               <div className="return-request-details">
                 <h3>{request.productName}</h3>
                 <p>Order ID: #{request.orderId}</p>
-                <p>Buyer: {request.buyerName}</p>
+                <p>Seller: {request.sellerName}</p>
                 <p>Reason: {request.reasonCodeName}</p>
               </div>
             </div>
@@ -86,6 +58,13 @@ const ReturnRequestList = ({ requests, onRefresh }) => {
             </div>
           )}
 
+          {request.trackingNumber && (
+            <div className="return-request-tracking">
+              <p><strong>Tracking Number:</strong> {request.trackingNumber}</p>
+              <p><strong>Carrier:</strong> {request.shippingCarrier}</p>
+            </div>
+          )}
+
           <div className="return-request-actions">
             <button 
               className="btn-action"
@@ -93,30 +72,22 @@ const ReturnRequestList = ({ requests, onRefresh }) => {
             >
               View Details
             </button>
-            {request.status === 'Pending' && (
+            {request.status === 'AwaitingBuyerShipment' && (
               <button 
                 className="btn-action btn-primary"
-                onClick={() => setRespondModal({ isOpen: true, request })}
+                onClick={() => setShipModal({ isOpen: true, request })}
               >
-                Respond
-              </button>
-            )}
-            {request.status === 'ItemShipped' && (
-              <button 
-                className="btn-action btn-primary"
-                onClick={() => handleConfirmReceived(request.id)}
-              >
-                Confirm Received
+                Ship Return
               </button>
             )}
           </div>
         </div>
       ))}
       
-      <RespondModal
-        isOpen={respondModal.isOpen}
-        onClose={() => setRespondModal({ isOpen: false, request: null })}
-        request={respondModal.request}
+      <ShipReturnModal
+        isOpen={shipModal.isOpen}
+        onClose={() => setShipModal({ isOpen: false, request: null })}
+        request={shipModal.request}
         onSuccess={onRefresh}
       />
       
@@ -129,4 +100,4 @@ const ReturnRequestList = ({ requests, onRefresh }) => {
   );
 };
 
-export default ReturnRequestList;
+export default BuyerReturnRequestList;
