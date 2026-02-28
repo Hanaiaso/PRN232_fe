@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import RespondModal from './RespondModal';
+import RefundModal from './RefundModal';
 import ReturnRequestDetailModal from '../order/ReturnRequestDetailModal';
 import { getAccessToken } from '@/api/token';
 
 const ReturnRequestList = ({ requests, onRefresh }) => {
   const [respondModal, setRespondModal] = useState({ isOpen: false, request: null });
   const [detailModal, setDetailModal] = useState({ isOpen: false, requestId: null });
+  const [refundModal, setRefundModal] = useState({ isOpen: false, request: null });
 
   const handleConfirmReceived = async (requestId) => {
     if (!confirm('Confirm that you have received the returned item?')) return;
@@ -32,6 +34,10 @@ const ReturnRequestList = ({ requests, onRefresh }) => {
       console.error('Error confirming received:', error);
       alert('Error confirming. Please try again.');
     }
+  };
+
+  const handleProcessRefund = (request) => {
+    setRefundModal({ isOpen: true, request });
   };
 
   if (!requests || requests.length === 0) {
@@ -109,6 +115,14 @@ const ReturnRequestList = ({ requests, onRefresh }) => {
                 Confirm Received
               </button>
             )}
+            {request.status === 'ItemReceived' && (
+              <button 
+                className="btn-action btn-primary"
+                onClick={() => handleProcessRefund(request)}
+              >
+                Process Refund
+              </button>
+            )}
           </div>
         </div>
       ))}
@@ -117,6 +131,13 @@ const ReturnRequestList = ({ requests, onRefresh }) => {
         isOpen={respondModal.isOpen}
         onClose={() => setRespondModal({ isOpen: false, request: null })}
         request={respondModal.request}
+        onSuccess={onRefresh}
+      />
+      
+      <RefundModal
+        isOpen={refundModal.isOpen}
+        onClose={() => setRefundModal({ isOpen: false, request: null })}
+        request={refundModal.request}
         onSuccess={onRefresh}
       />
       
