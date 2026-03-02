@@ -32,7 +32,7 @@ const CheckoutSuccess = () => {
                 setLoading(false);
             } catch (error) {
                 displayActionMessage(error.message || 'Payment failed', 'error');
-                history.push('/checkout/step3');
+                history.push('/checkout');
             }
         };
 

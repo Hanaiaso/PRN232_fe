@@ -38,7 +38,7 @@ ProductFeatured.propTypes = {
   product: PropType.shape({
     image: PropType.string,
     name: PropType.string,
-    id: PropType.string,
+    id: PropType.oneOfType([PropType.string, PropType.number]),
     brand: PropType.string
   }).isRequired
 };
