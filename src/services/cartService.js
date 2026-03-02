@@ -60,18 +60,32 @@ export const cartService = {
         }
     },
 
-    getCheckoutSummary: async (cartItemIds) => {
+    getCheckoutSummary: async (cartItemIds, addressId = null, couponId = null) => {
         try {
-            const response = await post(`${BASE}/summary`, { cartItemIds });
+            const payload = { cartItemIds };
+            if (addressId) payload.addressId = addressId;
+            if (couponId) payload.couponId = couponId;
+            const response = await post(`${BASE}/summary`, payload);
             return response;
         } catch (error) {
             throw error;
         }
     },
 
-    placeOrder: async (cartItemIds) => {
+    placeOrder: async (cartItemIds, addressId, couponId = null) => {
         try {
-            const response = await post(`${BASE}/place-order`, { cartItemIds, addressId: 26 });
+            const payload = { cartItemIds, addressId };
+            if (couponId) payload.couponId = couponId;
+            const response = await post(`${BASE}/place-order`, payload);
+            return response;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    validateCoupon: async (code, subTotal) => {
+        try {
+            const response = await get(`${BASE}/coupon/${code}?subTotal=${subTotal}`);
             return response;
         } catch (error) {
             throw error;

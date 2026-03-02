@@ -4,5 +4,5 @@
  */
 
 export const API_CONFIG = {
-  BASE_URL: import.meta.env.VITE_API_URL || 'https://localhost:49547'
+  BASE_URL: import.meta.env.VITE_API_URL || 'https://localhost:53467'
 };

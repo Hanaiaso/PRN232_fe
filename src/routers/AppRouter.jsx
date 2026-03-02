@@ -90,16 +90,9 @@ const AppRouter = () => (
           path={ROUTES.SELLER_HUB}
         />
         <Route
-          component={view.CheckOutStep1}
+          component={view.Checkout}
+          exact
           path={ROUTES.CHECKOUT_STEP_1}
-        />
-        <Route
-          component={view.CheckOutStep2}
-          path={ROUTES.CHECKOUT_STEP_2}
-        />
-        <Route
-          component={view.CheckOutStep3}
-          path={ROUTES.CHECKOUT_STEP_3}
         />
         <Route
           component={view.CheckoutSuccess}
