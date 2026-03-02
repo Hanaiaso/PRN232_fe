@@ -1,10 +1,11 @@
-import { CheckOutlined } from '@ant-design/icons';
+import { CheckOutlined, ThunderboltOutlined } from '@ant-design/icons';
 import { ImageLoader } from '@/components/common';
 import { displayMoney } from '@/helpers/utils';
 import PropType from 'prop-types';
 import React from 'react';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import { useHistory } from 'react-router-dom';
+import CountdownTimer from '../auction/CountdownTimer';
 
 const ProductItem = ({ product, isItemOnBasket, addToBasket }) => {
   const history = useHistory();
@@ -33,6 +34,11 @@ const ProductItem = ({ product, isItemOnBasket, addToBasket }) => {
         }}
       >
         {itemOnBasket && <CheckOutlined className="fa fa-check product-card-check" />}
+        {product.isAuction && (
+          <div className="product-card-auction-badge">
+            <ThunderboltOutlined /> Đấu giá
+          </div>
+        )}
         <div
           className="product-card-content"
           onClick={onClickItem}
@@ -46,6 +52,11 @@ const ProductItem = ({ product, isItemOnBasket, addToBasket }) => {
                 src={product.image}
               />
             ) : <Skeleton width="100%" height="90%" />}
+            {product.isAuction && product.auctionEndTime && (
+              <div className="product-card-timer">
+                <CountdownTimer endTime={product.auctionEndTime} />
+              </div>
+            )}
           </div>
           <div className="product-details">
             <h5 className="product-card-name text-overflow-ellipsis margin-auto">
@@ -55,17 +66,30 @@ const ProductItem = ({ product, isItemOnBasket, addToBasket }) => {
               {product.brand || <Skeleton width={60} />}
             </p>
             <h4 className="product-card-price">
-              {product.price ? displayMoney(product.price) : <Skeleton width={40} />}
+              {product.price ? (
+                product.isAuction
+                  ? displayMoney(product.currentHighestBid || product.price)
+                  : displayMoney(product.price)
+              ) : <Skeleton width={40} />}
             </h4>
           </div>
         </div>
-        {product.id && (
+        {product.id && !product.isAuction && (
           <button
             className={`product-card-button button-small button button-block ${itemOnBasket ? 'button-border button-border-gray' : ''}`}
             onClick={handleAddToBasket}
             type="button"
           >
             {itemOnBasket ? 'Remove from basket' : 'Add to basket'}
+          </button>
+        )}
+        {product.id && product.isAuction && (
+          <button
+            className="product-card-button button-small button button-block"
+            onClick={onClickItem}
+            type="button"
+          >
+            Đặt giá ngay
           </button>
         )}
 

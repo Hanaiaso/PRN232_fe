@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 // Product API Configuration
 export const PRODUCT_CONFIG = {
   BASE_URL: 'https://fakestoreapi.com',
@@ -7,6 +8,75 @@ export const PRODUCT_CONFIG = {
     BY_CATEGORY: (category) => `/products/category/${category}`,
     CATEGORIES: '/products/categories'
   }
+=======
+/**
+ * Product API - connects to the real .NET backend
+ * Base: http://localhost:5000/api/product
+ */
+import { get, post, put, del } from '../client';
+
+const BASE = '/api/product';
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Normalize a ProductDto from the backend into the shape used by FE components.
+ * Backend:  { id, title, description, categoryId, categoryName, sellerId,
+ *             sellerName, isAuction, auctionEndTime, minPrice, maxPrice,
+ *             totalStock, averageRating, reviewCount, variants[] }
+ * FE shape: { id, name, description, brand, price, originalPrice, image,
+ *             imageCollection, sizes, availableColors, ... }
+ */
+export const normalizeProduct = (p) => {
+  if (!p) return null;
+
+  // Use the first variant's image (if any) as the primary image
+  const primaryVariant = p.variants && p.variants.length > 0 ? p.variants[0] : null;
+  const image = primaryVariant?.variantImageUrl || null;
+
+  // Build imageCollection from variants
+  const imageCollection = (p.variants || [])
+    .filter((v) => v.variantImageUrl)
+    .map((v, i) => ({ id: v.id || i + 1, url: v.variantImageUrl }));
+
+  return {
+    id: p.id,
+    name: p.title || '',
+    description: p.description || '',
+    brand: p.sellerName || p.categoryName || '',
+    price: p.minPrice || 0,
+    originalPrice: p.maxPrice || p.minPrice || 0,
+    image,
+    images: imageCollection.map((img) => img.url),
+    imageCollection,
+    // sizes / colors – not yet in BE DTO; keep defaults so UI doesn't break
+    sizes: [],
+    availableColors: [],
+    // metadata
+    categoryId: p.categoryId,
+    categoryName: p.categoryName || '',
+    sellerId: p.sellerId,
+    sellerName: p.sellerName || '',
+    isAuction: p.isAuction || false,
+    auctionEndTime: p.auctionEndTime || null,
+    totalStock: p.totalStock || 0,
+    rating: p.averageRating || 0,
+    reviews: p.reviewCount || 0,
+    isFeatured: false,
+    isRecommended: false,
+    inStock: (p.totalStock || 0) > 0,
+    variants: p.variants || [],
+    // Auction fields
+    currentHighestBid: p.currentHighestBid || 0,
+    bidCount: p.bidCount || 0,
+    // keep raw fields for admin forms
+    title: p.title || '',
+    minPrice: p.minPrice || 0,
+    maxPrice: p.maxPrice || 0,
+  };
+>>>>>>> Stashed changes
 };
 
 // Product API Client
