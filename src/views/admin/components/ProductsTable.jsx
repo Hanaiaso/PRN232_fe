@@ -9,19 +9,19 @@ const ProductsTable = ({ filteredProducts }) => (
       <div className="grid grid-product grid-count-6">
         <div className="grid-col" />
         <div className="grid-col">
-          <h5>Name</h5>
+          <h5>Tên sản phẩm</h5>
         </div>
         <div className="grid-col">
-          <h5>Brand</h5>
+          <h5>Danh mục</h5>
         </div>
         <div className="grid-col">
-          <h5>Price</h5>
+          <h5>Giá</h5>
         </div>
         <div className="grid-col">
-          <h5>Date Added</h5>
+          <h5>Tồn kho</h5>
         </div>
         <div className="grid-col">
-          <h5>Qty</h5>
+          <h5>Người bán</h5>
         </div>
       </div>
     )}

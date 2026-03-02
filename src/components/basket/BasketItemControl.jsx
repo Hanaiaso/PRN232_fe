@@ -1,21 +1,20 @@
 import { MinusOutlined, PlusOutlined } from '@ant-design/icons';
 import PropType from 'prop-types';
 import React from 'react';
-import { useDispatch } from 'react-redux';
-import { addQtyItem, minusQtyItem } from '@/redux/actions/basketActions';
+import { useBasket } from '@/hooks';
 
 const BasketItemControl = ({ product }) => {
-  const dispatch = useDispatch();
+  const { updateQuantity } = useBasket();
 
   const onAddQty = () => {
     if (product.quantity < product.maxQuantity) {
-      dispatch(addQtyItem(product.id));
+      updateQuantity(product.cartItemId, product.quantity + 1);
     }
   };
 
   const onMinusQty = () => {
     if ((product.maxQuantity >= product.quantity) && product.quantity !== 0) {
-      dispatch(minusQtyItem(product.id));
+      updateQuantity(product.cartItemId, product.quantity - 1);
     }
   };
 
@@ -43,7 +42,7 @@ const BasketItemControl = ({ product }) => {
 
 BasketItemControl.propTypes = {
   product: PropType.shape({
-    id: PropType.string,
+    id: PropType.oneOfType([PropType.string, PropType.number]),
     name: PropType.string,
     brand: PropType.string,
     price: PropType.number,

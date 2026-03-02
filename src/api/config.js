@@ -1,7 +1,8 @@
 /**
  * API Configuration
+ * Set Vite env variable VITE_API_URL to override (e.g. in .env)
  */
 
 export const API_CONFIG = {
-  BASE_URL: 'https://fakestoreapi.com'
+  BASE_URL: import.meta.env.VITE_API_URL || 'https://localhost:49547'
 };

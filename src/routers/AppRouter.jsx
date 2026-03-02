@@ -57,6 +57,10 @@ const AppRouter = () => (
           component={view.ForgotPassword}
           path={ROUTES.FORGOT_PASSWORD}
         />
+        <PublicRoute
+          component={view.ConfirmEmail}
+          path={ROUTES.CONFIRM_EMAIL}
+        />
         <Route
           component={view.ViewProduct}
           path={ROUTES.VIEW_PRODUCT}
@@ -71,17 +75,35 @@ const AppRouter = () => (
           exact
           path={ROUTES.ACCOUNT_EDIT}
         />
-        <ClientRoute
+        <Route
+          component={view.PurchaseHistory}
+          exact
+          path={ROUTES.PURCHASE_HISTORY}
+        />
+        <Route
+          component={view.SellerHub}
+          exact
+          path={ROUTES.SELLER_HUB}
+        />
+        <Route
           component={view.CheckOutStep1}
           path={ROUTES.CHECKOUT_STEP_1}
         />
-        <ClientRoute
+        <Route
           component={view.CheckOutStep2}
           path={ROUTES.CHECKOUT_STEP_2}
         />
-        <ClientRoute
+        <Route
           component={view.CheckOutStep3}
           path={ROUTES.CHECKOUT_STEP_3}
+        />
+        <Route
+          component={view.CheckoutSuccess}
+          path={ROUTES.CHECKOUT_SUCCESS}
+        />
+        <Route
+          component={view.CheckoutCancel}
+          path={ROUTES.CHECKOUT_CANCEL}
         />
         <AdminRoute
           component={view.Dashboard}

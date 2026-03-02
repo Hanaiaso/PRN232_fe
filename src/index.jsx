@@ -7,6 +7,7 @@ import configureStore from '@/redux/store/store';
 import '@/styles/style.scss';
 import WebFont from 'webfontloader';
 import App from './App';
+import { onAuthStateChanged } from '@/redux/actions/authActions';
 
 WebFont.load({
   google: {
@@ -17,7 +18,10 @@ WebFont.load({
 const { store, persistor } = configureStore();
 const root = document.getElementById('app');
 
-// Render the app directly (no authentication check needed for static site)
+// Dispatch auth restore on startup
+store.dispatch(onAuthStateChanged());
+
+// Render the app
 render(<App store={store} persistor={persistor} />, root);
 
 if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {

@@ -1,8 +1,8 @@
 /* eslint-disable indent */
 import {
-  DownOutlined, LoadingOutlined, LogoutOutlined, UserOutlined
+  DownOutlined, LoadingOutlined, LogoutOutlined, UserOutlined, ShoppingOutlined
 } from '@ant-design/icons';
-import { ACCOUNT } from '@/constants/routes';
+import { ACCOUNT, PURCHASE_HISTORY } from '@/constants/routes';
 import PropTypes from 'prop-types';
 import React, { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -65,13 +65,22 @@ const UserNav = () => {
       <DownOutlined style={{ fontSize: '1.2rem', marginLeft: '1rem' }} />
       <div className="user-nav-sub">
         {profile.role !== 'ADMIN' && (
-          <Link
-            to={ACCOUNT}
-            className="user-nav-sub-link"
-          >
-            View Account
-            <UserOutlined />
-          </Link>
+          <>
+            <Link
+              to={ACCOUNT}
+              className="user-nav-sub-link"
+            >
+              View Account
+              <UserOutlined />
+            </Link>
+            <Link
+              to={PURCHASE_HISTORY}
+              className="user-nav-sub-link"
+            >
+              Purchase History
+              <ShoppingOutlined />
+            </Link>
+          </>
         )}
         <h6
           className="user-nav-sub-link margin-0 d-flex"

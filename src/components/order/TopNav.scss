@@ -1,0 +1,45 @@
+@import '../../styles/2 - tools/mixins';
+
+.purchase-top-nav {
+  border-bottom: 1px solid #e0e0e0;
+  padding: 0 2.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  @include mobile {
+    padding: 0 1.5rem;
+  }
+}
+
+.purchase-top-nav-items {
+  display: flex;
+  gap: 2.4rem;
+
+  @include mobile {
+    gap: 1.5rem;
+  }
+}
+
+.purchase-top-nav-item {
+  padding: 1.6rem 0;
+  cursor: pointer;
+  font-size: 1.5rem;
+
+  @include mobile {
+    font-size: 1.3rem;
+    padding: 1.2rem 0;
+  }
+}
+
+.purchase-top-nav-user {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  color: #3665f3;
+  font-size: 1.3rem;
+
+  @include mobile {
+    font-size: 1.2rem;
+  }
+}

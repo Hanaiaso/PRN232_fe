@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, withRouter } from 'react-router-dom';
 import { applyFilter, resetFilter } from '@/redux/actions/filterActions';
 import { selectMax, selectMin } from '@/selectors/selector';
+import { getCategories } from '@/api/endpoints/category';
 import PriceRange from './PriceRange';
 
 const Filters = ({ closeModal }) => {
@@ -20,12 +21,26 @@ const Filters = ({ closeModal }) => {
     maxPrice: filter.maxPrice,
     sortBy: filter.sortBy
   });
+  const [categories, setCategories] = useState([]);
   const dispatch = useDispatch();
   const history = useHistory();
   const didMount = useDidMount();
 
   const max = selectMax(products);
   const min = selectMin(products);
+
+  useEffect(() => {
+    // Fetch categories on mount
+    const fetchCategories = async () => {
+      try {
+        const result = await getCategories();
+        setCategories(result);
+      } catch (error) {
+        console.error('Failed to fetch categories', error);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     if (didMount && window.screen.width <= 480) {
@@ -62,6 +77,7 @@ const Filters = ({ closeModal }) => {
 
     if (isChanged) {
       dispatch(applyFilter(field));
+      dispatch({ type: 'GET_PRODUCTS' }); // Trigger saga
     } else {
       closeModal();
     }
@@ -72,6 +88,7 @@ const Filters = ({ closeModal }) => {
 
     if (filterFields.some((key) => !!filter[key])) {
       dispatch(resetFilter());
+      dispatch({ type: 'GET_PRODUCTS' }); // Trigger saga
     } else {
       closeModal();
     }
@@ -80,10 +97,10 @@ const Filters = ({ closeModal }) => {
   return (
     <div className="filters">
       <div className="filters-field">
-        <span>Brand</span>
+        <span>Category</span>
         <br />
         <br />
-        {products.length === 0 && isLoading ? (
+        {categories.length === 0 ? (
           <h5 className="text-subtle">Loading Filter</h5>
         ) : (
           <select
@@ -92,11 +109,10 @@ const Filters = ({ closeModal }) => {
             disabled={isLoading || products.length === 0}
             onChange={onBrandFilterChange}
           >
-            <option value="">All Brands</option>
-            <option value="salt">Salt Maalat</option>
-            <option value="betsin">Betsin Maalat</option>
-            <option value="black">Black Kibal</option>
-            <option value="sexbomb">Sexbomb</option>
+            <option value="">All Categories</option>
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>{cat.name}</option>
+            ))}
           </select>
         )}
       </div>
