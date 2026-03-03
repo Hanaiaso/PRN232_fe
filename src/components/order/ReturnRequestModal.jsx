@@ -12,10 +12,18 @@ const ReturnRequestModal = ({ isOpen, onClose, order, item }) => {
     setLoading(true);
 
     try {
+      console.log('Order:', order);
+      console.log('Item:', item);
+      
       const token = getAccessToken();
       const formData = new FormData();
       formData.append('OrderId', order.id);
-      if (item) formData.append('OrderItemId', item.orderId);
+      if (item && item.id) {
+        formData.append('OrderItemId', item.id);
+        console.log('OrderItemId:', item.id);
+      } else {
+        console.log('No item or item.id, returning entire order');
+      }
       formData.append('ReasonCode', reasonCode);
       formData.append('Reason', reason);
       
