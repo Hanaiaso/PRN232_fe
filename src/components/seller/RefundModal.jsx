@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { getAccessToken } from '@/api/token';
 
 const RefundModal = ({ isOpen, onClose, request, onSuccess }) => {
   const [refundMethod, setRefundMethod] = useState('original');
@@ -13,14 +14,38 @@ const RefundModal = ({ isOpen, onClose, request, onSuccess }) => {
 
     setLoading(true);
 
-    // TODO: Call backend API when implemented
-    // For now, just show success message
-    setTimeout(() => {
-      alert(`Refund of $${refundAmount} has been processed successfully!\n\nNote: Backend API not yet implemented. This is UI only.`);
+    try {
+      const token = getAccessToken();
+      const res = await fetch(`https://localhost:49547/api/ReturnRequest/${request.id}/refund`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          RefundAmount: refundAmount,
+          RefundMethod: refundMethod,
+          Notes: notes,
+          PayPalCaptureId: request.paypalCaptureId || null
+        })
+      });
+
+      const result = await res.json();
+
+      if (res.ok && result.success) {
+        alert(`Refund processed successfully!\n\nRefund ID: ${result.data.refundId}\nAmount: $${result.data.amount}\nStatus: ${result.data.status}`);
+        setLoading(false);
+        onSuccess();
+        onClose();
+      } else {
+        alert(result.message || 'Failed to process refund');
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error('Error processing refund:', error);
+      alert('Error processing refund. Please try again.');
       setLoading(false);
-      onSuccess();
-      onClose();
-    }, 1000);
+    }
   };
 
   if (!isOpen || !request) return null;
@@ -84,14 +109,14 @@ const RefundModal = ({ isOpen, onClose, request, onSuccess }) => {
           </div>
 
           <div className="refund-notice" style={{
-            background: '#fff3cd',
-            border: '1px solid #ffc107',
+            background: '#d4edda',
+            border: '1px solid #28a745',
             padding: '10px',
             borderRadius: '5px',
             marginBottom: '15px'
           }}>
-            <strong>⚠️ Notice:</strong> Backend API not yet implemented. This is UI preview only.
-            The refund will be processed according to your payment gateway settings.
+            <strong>✅ PayPal Integration:</strong> Refunds will be processed through PayPal automatically.
+            For manual refunds, a reference ID will be generated.
           </div>
 
           <div className="modal-footer">
