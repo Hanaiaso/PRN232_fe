@@ -9,12 +9,14 @@ export const signIn = (email, password, accountType = 'personal') => ({
   }
 });
 
-export const signInWithGoogle = () => ({
-  type: type.SIGNIN_WITH_GOOGLE
+export const signInWithGoogle = (idToken) => ({
+  type: type.SIGNIN_WITH_GOOGLE,
+  payload: idToken
 });
 
-export const signInWithFacebook = () => ({
-  type: type.SIGNIN_WITH_FACEBOOK
+export const signInWithFacebook = (accessToken) => ({
+  type: type.SIGNIN_WITH_FACEBOOK,
+  payload: accessToken
 });
 
 export const signInWithGithub = () => ({
@@ -57,8 +59,17 @@ export const onAuthStateFail = (error) => ({
   payload: error
 });
 
-export const resetPassword = (email) => ({
-  type: type.RESET_PASSWORD,
+export const forgotPassword = (email) => ({
+  type: type.FORGOT_PASSWORD,
   payload: email
+});
+
+export const confirmResetPassword = (token, newPassword, confirmPassword) => ({
+  type: type.CONFIRM_RESET_PASSWORD,
+  payload: {
+    token,
+    newPassword,
+    confirmPassword
+  }
 });
 
