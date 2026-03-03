@@ -25,11 +25,35 @@ export const confirmEmail = async (token) => {
   return get(url);
 };
 
+export const forgotPassword = async (email) => {
+  return post('/api/auth/forgot-password', { email });
+};
+
+export const resetPassword = async (token, newPassword, confirmPassword) => {
+  return post('/api/auth/reset-password', {
+    token,
+    newPassword,
+    confirmPassword
+  });
+};
+
+export const googleLogin = async (idToken) => {
+  return post('/api/auth/google-login', { idToken });
+};
+
+export const facebookLogin = async (accessToken) => {
+  return post('/api/auth/facebook-login', { accessToken });
+};
+
 export default {
   login,
   register,
   refresh,
   logout,
   me,
-  confirmEmail
+  confirmEmail,
+  forgotPassword,
+  resetPassword,
+  googleLogin,
+  facebookLogin
 };

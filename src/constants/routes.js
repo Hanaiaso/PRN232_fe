@@ -14,6 +14,7 @@ export const SIGNIN = '/signin';
 export const SIGNOUT = '/signout';
 export const SIGNUP = '/signup';
 export const FORGOT_PASSWORD = '/forgot_password';
+export const RESET_PASSWORD = '/reset_password';
 export const CONFIRM_EMAIL = '/confirm-email';
 export const CHECKOUT_STEP_1 = '/checkout';
 export const CHECKOUT_SUCCESS = '/checkout/success';

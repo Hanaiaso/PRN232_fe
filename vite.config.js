@@ -13,6 +13,18 @@ export default defineConfig({
     }
   },
   server: {
-    port: 3000
+    port: 3000,
+    // if there are local certificates, run over HTTPS (needed for Facebook login)
+    https: (function () {
+      try {
+        return {
+          key: require('fs').readFileSync('certs/localhost-key.pem'),
+          cert: require('fs').readFileSync('certs/localhost-crt.pem')
+        };
+      } catch (e) {
+        // certificates not found – fall back to http
+        return false;
+      }
+    })()
   }
 })

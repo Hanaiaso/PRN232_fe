@@ -4,7 +4,7 @@ import {
   SET_AUTH_PERSISTENCE,
   SIGNIN, SIGNIN_WITH_FACEBOOK,
   SIGNIN_WITH_GITHUB, SIGNIN_WITH_GOOGLE,
-  SIGNOUT, SIGNUP
+  SIGNOUT, SIGNUP, FORGOT_PASSWORD, CONFIRM_RESET_PASSWORD
 } from '@/constants/constants';
 import { SIGNIN as ROUTE_SIGNIN } from '@/constants/routes';
 import { call, put } from 'redux-saga/effects';
@@ -64,6 +64,51 @@ function* authSaga({ type, payload }) {
       }
       break;
     case SIGNIN_WITH_GOOGLE:
+      try {
+        yield initRequest();
+        const data = yield call(authApi.googleLogin, payload);
+
+        // Save tokens
+        const accessToken = data.accessToken || data.AccessToken;
+        const refreshToken = data.refreshToken || data.RefreshToken;
+        if (accessToken) setAccessToken(accessToken);
+        if (refreshToken) setRefreshToken(refreshToken);
+
+        // Load profile
+        const user = yield call(authApi.me);
+
+        yield put(setProfile(user));
+        yield put(signInSuccess({ id: user.id, role: user.role, provider: 'google' }));
+        yield put(setAuthStatus({ success: true, type: 'auth', isError: false, message: 'Successfully signed in with Google. Redirecting...' }));
+        yield put(setAuthenticating(false));
+        yield call(history.push, '/');
+      } catch (e) {
+        yield handleError(e);
+      }
+      break;
+    case SIGNIN_WITH_FACEBOOK:
+      try {
+        yield initRequest();
+        const data = yield call(authApi.facebookLogin, payload);
+
+        // Save tokens
+        const accessToken = data.accessToken || data.AccessToken;
+        const refreshToken = data.refreshToken || data.RefreshToken;
+        if (accessToken) setAccessToken(accessToken);
+        if (refreshToken) setRefreshToken(refreshToken);
+
+        // Load profile
+        const user = yield call(authApi.me);
+
+        yield put(setProfile(user));
+        yield put(signInSuccess({ id: user.id, role: user.role, provider: 'facebook' }));
+        yield put(setAuthStatus({ success: true, type: 'auth', isError: false, message: 'Successfully signed in with Facebook. Redirecting...' }));
+        yield put(setAuthenticating(false));
+        yield call(history.push, '/');
+      } catch (e) {
+        yield handleError(e);
+      }
+      break;
     case SIGNIN_WITH_FACEBOOK:
     case SIGNIN_WITH_GITHUB:
       // Social logins require backend support - inform user
@@ -123,9 +168,32 @@ function* authSaga({ type, payload }) {
       }
       break;
     }
+    case FORGOT_PASSWORD: {
+      try {
+        yield initRequest();
+        const res = yield call(authApi.forgotPassword, payload);
+        yield put(setAuthStatus({ success: true, type: 'auth', isError: false, message: res?.message || 'Nếu email tồn tại, bạn sẽ nhận được hướng dẫn đặt lại mật khẩu.' }));
+        yield put(setAuthenticating(false));
+      } catch (e) {
+        yield handleError(e);
+      }
+      break;
+    }
+    case CONFIRM_RESET_PASSWORD: {
+      try {
+        yield initRequest();
+        const res = yield call(authApi.resetPassword, payload.token, payload.newPassword, payload.confirmPassword);
+        yield put(setAuthStatus({ success: true, type: 'auth', isError: false, message: res?.message || 'Đặt lại mật khẩu thành công. Vui lòng đăng nhập lại.' }));
+        yield put(setAuthenticating(false));
+        yield call(history.push, ROUTE_SIGNIN);
+      } catch (e) {
+        yield handleError(e);
+      }
+      break;
+    }
     case RESET_PASSWORD: {
-      // Not implemented on provided backend
-      yield put(setAuthStatus({ success: false, type: 'reset', isError: true, message: 'Reset password is not implemented on the backend.' }));
+      // Legacy - not used anymore
+      yield put(setAuthStatus({ success: false, type: 'auth', isError: true, message: 'Please use forgot password.' }));
       yield put(setAuthenticating(false));
       break;
     }

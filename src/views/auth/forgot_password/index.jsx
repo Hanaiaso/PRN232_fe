@@ -2,7 +2,7 @@ import { CheckOutlined, LoadingOutlined } from '@ant-design/icons';
 import { useDidMount, useDocumentTitle, useScrollTop } from '@/hooks';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { resetPassword } from '@/redux/actions/authActions';
+import { forgotPassword } from '@/redux/actions/authActions';
 
 const ForgotPassword = () => {
   const { authStatus, isAuthenticating } = useSelector((state) => ({
@@ -24,13 +24,15 @@ const ForgotPassword = () => {
     }
   }, [authStatus, isAuthenticating]);
 
-  const onEmailChange = (value, error) => {
-    setField({ email: value, error });
+  const onEmailChange = (e) => {
+    const email = e.target.value;
+    const error = !email || !email.includes('@') ? 'Valid email required' : null;
+    setField({ email, error });
   };
 
   const onSubmitEmail = () => {
     if (!!field.email && !field.error) {
-      dispatch(resetPassword(field.email));
+      dispatch(forgotPassword(field.email));
     }
   };
 
@@ -45,8 +47,6 @@ const ForgotPassword = () => {
       <p>Enter your email address and we will send you a password reset email.</p>
       <br />
       <input
-        field="email"
-        required
         className="input-form"
         label="* Email"
         maxLength={40}
@@ -55,12 +55,13 @@ const ForgotPassword = () => {
         readOnly={isSendingForgotPWRequest || authStatus?.success}
         type="email"
         style={{ width: '100%' }}
+        value={field.email || ''}
       />
       <br />
       <br />
       <button
         className="button w-100-mobile"
-        disabled={isSendingForgotPWRequest || authStatus?.success}
+        disabled={isSendingForgotPWRequest || authStatus?.success || !!field.error}
         onClick={onSubmitEmail}
         type="button"
       >

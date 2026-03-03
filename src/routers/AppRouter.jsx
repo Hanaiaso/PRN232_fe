@@ -58,6 +58,10 @@ const AppRouter = () => (
           path={ROUTES.FORGOT_PASSWORD}
         />
         <PublicRoute
+          component={view.ResetPassword}
+          path={ROUTES.RESET_PASSWORD}
+        />
+        <PublicRoute
           component={view.ConfirmEmail}
           path={ROUTES.CONFIRM_EMAIL}
         />
